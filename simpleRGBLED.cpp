@@ -1,10 +1,36 @@
 //
-// simpleRGBLED v1.0.1
-// 2024.01.22
+//
+//  Simple RGB LED - Version 1.0.2
+//  This version was not deployed [2024.01.22]
+//
+//  Object class for a RGB LED controller
+//    simpleRGBLED(LED_R, LED_G, LED_B)
+//
+//    void rainbowRoutine() - Run every loop
+//
+//    String colorHex() - returns the current color as a string "XXXXXX"
+//    int colorHue() - returns current color as a hue 0-359*
+//    bool status() - return true/false for on/off
+//
+//    void on() - turn LED on
+//    void off() - turn LED off
+//    void toggle() - toggle LED state
+//    void warmWhite() - a warm white
+//    void coolWhite() - all LEDs at 100%
+//    void rainbowToggle() - enable/disable rainbow mode, setHex/Hue also ends rainbow mode
+//
+//    void setHex(String) - sets the LED color to hex color string "XXXXXX"
+//    void setHue(String) - sets the LED color to a hue string 0-359*
+//    void setHue(int) - sets the LED color to a hue int 0-359*
+//
+//  Changes From Previous Version
+//    Comments, cleanup
+//
 //
 
 #include "simpleRGBLED.h"
 
+// Write GPIO pin numbers to _rgbPins[] and set as output, LOW is off
 simpleRGBLED::simpleRGBLED(byte R, byte G, byte B) {
   _rgbPins[0] = R;
   _rgbPins[1] = G;
@@ -17,8 +43,8 @@ simpleRGBLED::simpleRGBLED(byte R, byte G, byte B) {
   }
 }
 
+// LED Rainbow, run every loop
 void simpleRGBLED::rainbowRoutine() {
-  // LED Rainbow, run every loop
   if (_rainbowState < 6) {
     rainbowStep();
     delay(5);
@@ -136,6 +162,9 @@ void simpleRGBLED::setHue(int input) {
 
 
 
+/*----------  PRIVATE  ----------*/
+
+// Writes values of _color[] to _rgbPins[], run after any setXXX()
 void simpleRGBLED::writeColor() {
   for (byte i = 0; i < 3; i++) {
     if (_color[i] == 0) {
@@ -149,6 +178,7 @@ void simpleRGBLED::writeColor() {
   if (!_isLEDon) { _isLEDon = true; }
 }
 
+// Convert hex color to dec and store in _color[]
 void simpleRGBLED::hexToRGB(char hex[]) {
   unsigned long colorInt = strtoul(hex, nullptr, 16);
 
@@ -157,6 +187,7 @@ void simpleRGBLED::hexToRGB(char hex[]) {
   _color[2] = colorInt;
 }
 
+// Write current color[] in dec to _colorHex
 void simpleRGBLED::writeHexString() {
   _colorHex = "";
   for (int i = 0; i < 3; i++) {
@@ -169,7 +200,9 @@ void simpleRGBLED::writeHexString() {
   }
 }
 
-void simpleRGBLED::hueToRGB(int hue) {    // Convert hue to RGB (color) (0° = Red, 120° = Green, 240° = Blue)
+
+// Convert hue to RGB (color) (0° = Red, 120° = Green, 240° = Blue)
+void simpleRGBLED::hueToRGB(int hue) {
   byte val = 255;
   byte sat = 255;
   byte base = ((255 - sat) * val) >> 8;
@@ -214,6 +247,7 @@ void simpleRGBLED::hueToRGB(int hue) {    // Convert hue to RGB (color) (0° = R
   writeHexString();
 }
 
+// Changes the color of the rainbow, run once per loop
 void simpleRGBLED::rainbowStep() {
   switch (_rainbowState) {
     case 0:    // R -> Y
